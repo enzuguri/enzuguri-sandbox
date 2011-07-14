@@ -1,0 +1,78 @@
+<!doctype html>
+<html>    
+<head>
+    <meta charset="utf-8">
+
+    <!-- Always force latest IE rendering engine (even in intranet) & Chrome Frame
+       Remove this if you use the .htaccess -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        
+        <style>
+            
+            body{
+                font-size : 14px;
+                font-family:"Arial";
+            }
+            
+            #canvasControls input{
+                
+                width:320px;
+                
+            }
+            
+            #columnLeft{
+                float:left;
+                width:400px;
+            }
+            
+            #columnRight{
+                float:left;
+            }
+            
+            span.tea{
+                color:#2b7879;
+            }
+            
+            span.sugar{
+                color:#662f1c;
+            }
+            
+            span.name{
+                color:#005d49;
+            }
+            
+            #teaForm ul li{
+                list-style:none;
+                
+            }
+            
+        </style>
+        
+        
+</head>
+    <body>
+        
+        <div id="columnLeft">
+            <canvas id="clock" width="600" height="480"></canvas>
+            <form name="controls" id="canvasControls">
+                <h4>Radians</h4>
+                <input type="text"/>
+            </form>
+        </div>
+        <div id="columnRight">
+            <form id="teaForm">
+                <h4>Time slot</h4>
+                <input name="time" type="text"/>
+                <h4>Number of Teas</h4>
+                <input name="count" type="text"/>
+            </form>    
+                
+        </div>    
+        
+        <script type="text/javascript" charset="utf-8" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+        <script src="gury.min.js" type="application/x-javascript"></script>
+        <script src="mustache.js" type="application/x-javascript"></script>
+        <script src="index.js" type="application/x-javascript"></script>
+        
+    </body>    
+</html>

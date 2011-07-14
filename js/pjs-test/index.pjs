@@ -1,0 +1,132 @@
+
+Pole[] poles;
+
+void setup(){
+   
+ size(600, 480); 
+ 
+ 
+ poles = new Pole[20];
+ 
+ for(int i = 0; i < 20; i++)
+ {
+   poles[i] = new Pole();
+ }
+  
+}
+
+void draw(){
+  
+ background(0);
+ noStroke();
+  
+ for(int i = 0; i < 20; i++)
+ {
+   poles[i].draw();
+ }
+ 
+  
+}
+
+
+
+
+
+public class Pole
+{
+  
+  float xPos;
+  float yPos;
+
+  float radX;
+  float radY;
+
+  float xSpeed;
+  float ySpeed;
+
+  float radius;
+  float size;
+
+  float blueAmount;
+  
+   
+   void seed()
+   {
+    size = random(8.0, 22.0);
+	
+    blueAmount = random(120, 255);
+	
+    radius = random(40, 100);
+	
+    xPos = random(radius, 600 - radius);
+    yPos = random(radius, 480 - radius);
+	
+    radX = random(-PI, PI);
+    radY = random(-PI, PI);
+	
+    xSpeed = random(0.06, 0.020);
+    ySpeed = random(0.06, 0.020);  
+   }
+  
+  
+  
+  
+  
+  void draw(){
+	
+	
+
+	int count = 160;
+	
+	float circleSize = size;
+	
+	float angX = radX;
+	float angY = radY;
+	
+	int alp = 255;
+	
+        fill(45,125,blueAmount, 50);// 255 - ((alp / count) * i));
+
+	for(int i = 0; i < count; i+=2)
+	{
+		ellipse(xPos + cos(angX) *radius, yPos + sin(angY) * radius, circleSize, circleSize);
+		angX = radX - (xSpeed * (i+1));
+		angY = radY - (ySpeed * (i+1));
+		circleSize = max(0.2, circleSize - 0.08);
+	}
+	
+	
+	
+	radX += xSpeed;
+	radY += ySpeed;
+	
+	if (radX > PI)
+	{
+		radX -= PI*2;
+	}
+	
+	if(radY > PI)
+	{
+		radY -= PI*2;	
+	}
+	
+}
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  Pole()
+  {
+    seed();  
+  }
+  
+  
+}
