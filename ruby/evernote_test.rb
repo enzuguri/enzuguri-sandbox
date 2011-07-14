@@ -1,15 +1,11 @@
 #!/usr/bin/env ruby
 require 'rubygems'
 require 'evernote'
+require 'yaml'
 
 user_store_url = "https://sandbox.evernote.com/edam/user"
 
-config = {
-   :username => 'enzuguri',
-   :password => '12monk3yS',
-   :consumer_key => 'enzuguri',
-   :consumer_secret => '21837a717a1dba12'
-         }
+config = YAML.load_file "evernote.yml"
 
 # note, you could also read in your consumer key information from a YML file
 
