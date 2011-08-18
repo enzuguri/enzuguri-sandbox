@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Draggable Canvas</title>
+        <!-- data-main attribute tells require.js to load
+             scripts/main.js after require.js loads. -->
+        <script data-main="scripts/main.js" src="scripts/require.js"></script>
+        <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/themes/flick/jquery-ui.css">
+            
+        <style>
+            
+            #drag
+            {
+                width:300px;
+                height:300px;
+                
+            }
+            
+            .ui-container
+            {
+                position:relative;
+                width:100%;
+                height:100%;
+            }
+            
+            #ui-outer
+            {
+                position:absolute;
+                width:100%;
+                height:100%;
+                background: black;
+                
+            }
+            
+            #ui-inner
+            {
+                position:absolute;
+                width:100%;
+                height:100%;
+                background: gray;
+            }
+            
+        
+        </style>
+            
+    </head>
+    <body>
+        <div class="ui-widget-content" id="drag">
+            <h1>My Sample Project</h1>
+        </div>    
+    </body>
+</html>

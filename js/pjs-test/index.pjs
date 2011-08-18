@@ -1,132 +1,304 @@
+float zAng;
+float tzAng;
 
-Pole[] poles;
+float xAng;
+float txAng;
 
-void setup(){
-   
- size(600, 480); 
- 
- 
- poles = new Pole[20];
- 
- for(int i = 0; i < 20; i++)
- {
-   poles[i] = new Pole();
- }
+float worldX;
+float worldY;
+
+float tworldX;
+float tworldY;
+
+int fillColor;
+
+Island shape1;
+Island shape2;
+Island shape3;
+Island shape4;
+
+
+Island[] orbitals;
+Island sun;
+
+
+
+		
+void setup() {
+  size(800, 600);
+  smooth();
+  zAng = 0.0;
+  tzAng = 0.0;
+  zAng = 0;
+  txAng = 0;
+  
+  tworldX = 0.0;
+  tworldY = 0.0;
+  
+  fillColor = 12;
+  
+  shape1 = new Island(-100.0, 0.0, 0.0, 3);
+  shape1.block(0, 0, 0);
+  shape1.block(0, 20, 0);
+  shape1.block(20, 20, 0);
+  
+  shape2 = new Island(100, 0, 0, 3);
+  shape2.block(0,0,0);
+  shape2.block(20,0,0);
+  shape2.block(20,20,0);
+
+  
+  //shape 2
+  shape3 = new Island(0, 50, 0, 3);
+  shape3.block(0, 0, 0);
+  shape3.block(0, 20, 0);
+  shape3.block(20, 20, 0);
+  
+  worldX = 0;
+  worldY = 0;
+  
+  
+  //active shape
+  
+  shape4 = new Island(0,0,0,4);
+  shape4.block(0,0,0);
+  shape4.block(0,0,20);
+  shape4.block(20,0,20);
+  shape4.block(20,0,0);
+  
+  
+  orbitals = new Island[3];
+  orbitals[0] = shape1;
+  orbitals[1] = shape2;
+  orbitals[2] = shape3;
+  
+  sun = shape4;
   
 }
 
-void draw(){
+
+void ease()
+{
+  float diff = tzAng - zAng;
+  zAng += diff * 0.12;
   
- background(0);
- noStroke();
+  diff = txAng - xAng;
+  xAng += diff * 0.12;
   
- for(int i = 0; i < 20; i++)
- {
-   poles[i].draw();
- }
- 
+  diff = tworldX - worldX;
+  worldX += diff * 0.12;
+  
+  
+  diff = tworldY - worldY;
+  worldY += diff * 0.12;
   
 }
 
 
 
+		
+void draw() {
+  
+  size(800, 600);
+  background(255);
+  
+  ease();
+    
+  
+  camera(70.0, 35.0, 120.0, width/2, height/2, 0.0, 0.0, 1.0, 0.0);
+  
+  translate(width/2, height/2);
+  
+  
+  fill(fillColor, 190);
+  
+  sun.drawIsland(xAng, worldX, worldY, false);
+    
+  fill(255, 180);  
+  
+  rotateX(zAng);
+  
+  
+  int len = orbitals.length;
+  
+  
+  for(int i = 0; i < len; i++)
+  {
+    orbitals[i].drawIsland(xAng, worldX, worldY);
+  }
+  
+  
+  rotateX(-zAng);
+}
 
 
-public class Pole
+void keyPressed()
 {
   
-  float xPos;
-  float yPos;
-
-  float radX;
-  float radY;
-
-  float xSpeed;
-  float ySpeed;
-
-  float radius;
-  float size;
-
-  float blueAmount;
   
-   
-   void seed()
-   {
-    size = random(8.0, 22.0);
-	
-    blueAmount = random(120, 255);
-	
-    radius = random(40, 100);
-	
-    xPos = random(radius, 600 - radius);
-    yPos = random(radius, 480 - radius);
-	
-    radX = random(-PI, PI);
-    radY = random(-PI, PI);
-	
-    xSpeed = random(0.06, 0.020);
-    ySpeed = random(0.06, 0.020);  
-   }
-  
-  
-  
-  
-  
-  void draw(){
-	
-	
-
-	int count = 160;
-	
-	float circleSize = size;
-	
-	float angX = radX;
-	float angY = radY;
-	
-	int alp = 255;
-	
-        fill(45,125,blueAmount, 50);// 255 - ((alp / count) * i));
-
-	for(int i = 0; i < count; i+=2)
-	{
-		ellipse(xPos + cos(angX) *radius, yPos + sin(angY) * radius, circleSize, circleSize);
-		angX = radX - (xSpeed * (i+1));
-		angY = radY - (ySpeed * (i+1));
-		circleSize = max(0.2, circleSize - 0.08);
-	}
-	
-	
-	
-	radX += xSpeed;
-	radY += ySpeed;
-	
-	if (radX > PI)
-	{
-		radX -= PI*2;
-	}
-	
-	if(radY > PI)
-	{
-		radY -= PI*2;	
-	}
-	
-}
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  Pole()
+  if(keyCode == LEFT)
   {
-    seed();  
+     tzAng -= PI / 2;
   }
+ else if(keyCode == RIGHT)
+{
+   tzAng += PI / 2;
+} 
+  
+  
+  if(keyCode == UP)
+  {
+    txAng -= PI /2;
+  }
+  else if(keyCode == DOWN)
+  {
+    txAng += PI /2;
+  }
+  
+  
+  switch(key)
+  {
+    case '1':
+      
+      orbitals[0] = shape2;
+      orbitals[1] = shape3;
+      orbitals[2] = shape4;
+      
+      sun = shape1;
+      break;
+      
+   case '2':
+      
+      orbitals[0] = shape3;
+      orbitals[1] = shape4;
+      orbitals[2] = shape1;
+      
+      sun = shape2;
+      break;   
+   
+   case '3':
+      
+      orbitals[0] = shape4;
+      orbitals[1] = shape1;
+      orbitals[2] = shape2;
+      
+      sun = shape3;
+      break;
+   
+   case '4':
+      
+      orbitals[0] = shape1;
+      orbitals[1] = shape2;
+      orbitals[2] = shape3;
+      
+      sun = shape4;
+      break;
+      
+    
+    default:
+      fillColor = 12;
+      break;
+    
+  }
+  
+  
+  easeCenterTo(sun);
+  
+}
+
+
+void easeCenterTo(Island isl)
+{
+  tworldX = -isl.x;
+  tworldY = -isl.y;
+}
+
+
+public class Island
+{
+  
+  Block[] blocks;
+  
+  float x;
+  float y;
+  float z;
+  
+  int slot = 0;
+  
+  public Island(float ax, float ay, float az, int count)
+  {
+    blocks = new Block[count];
+    x = ax;
+    y = ay;
+    z = az;
+  }
+  
+  
+ public void block(float ax, float ay, float az)
+ {
+   blocks[slot] = new Block(ax, ay, az);
+   slot++;
+ }
+ 
+ public void drawIsland(float xAng, float offX, float offY)
+ {
+   drawIsland(xAng, offX, offY, true);
+ }
+ 
+ 
+ public void drawIsland(float xAng, float offX, float offY, boolean rot)
+ {
+   int len = blocks.length;
+   
+    if(rot) rotateZ(xAng);
+    translate(x + offX, y + offY,  z);
+   
+   
+   
+   for(int i = 0; i < len; i++)
+   {
+     blocks[i].drawBlock();
+   }
+   
+  
+  translate(-(x + offX), -(y + offY),  -z);
+  if(rot) rotateZ(-xAng);
+ }
+  
+  
+}
+
+
+
+public class Block
+{
+  float x;
+  float y;
+  float z;
+  
+  
+  Block(float ax, float ay, float az)
+  {
+    x = ax;
+    y = ay;
+    z = az;
+  }
+  
+  
+  void drawBlock()
+  {
+    translate(x, y, z);
+    
+    box(20);
+    
+    translate(-x, -y, -z);
+    
+  }
+  
+  
+  
+  
+  
   
   
 }
