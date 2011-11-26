@@ -1,5 +1,12 @@
 (function($){
   
+  var ItemStatus = {
+    Published:0,
+    UnPublished:1
+  }
+  
+  
+  
   var FlickrCollection = Backbone.Collection.extend({
     model:Backbone.Model.extend({}),
     
@@ -13,7 +20,13 @@
       var self = this;
       
       $.getJSON(url, function(response){
-                self.refresh(response.photos.photo);
+                
+                var photos = response.photos.photo;
+                $.each(photos, function(i, item){
+                  item.type = "flickr";
+                  item.status = ItemStatus.UnPublished;
+                });
+                self.refresh(photos);
               }
       );
       
@@ -40,7 +53,14 @@
               url:url,
               dataType:"jsonp",
               success:function(response){
-                self.refresh(response.data);
+                
+                var photos = response.data;
+                
+                $.each(photos, function(i, item){
+                  item.type = "instagram";
+                  item.status = ItemStatus.UnPublished;
+                });
+                self.refresh(photos);
               }
             }
       );
@@ -63,7 +83,15 @@
       var self = this;
       
       $.ajax({url:url, dataType:"jsonp", success:function(response){
-        self.refresh(response.data);
+        
+        var mixes = response.data;
+        
+        $.each(mixes, function(i, item){
+          item.type = "mixCloud";
+          item.status = ItemStatus.UnPublished;
+        });
+        
+        self.refresh(mixes);
       }});
       
     }
@@ -84,6 +112,13 @@
               limit: 20,
               page: 1,
               success: function(videos) {
+                
+                
+                $.each(videos, function(i, item){
+                  item.type = "youtube";
+                  item.status = ItemStatus.UnPublished;
+                });
+                
                 self.refresh(videos);      
               },
               error: function(error) {
@@ -111,7 +146,15 @@
       var url = "https://graph.facebook.com/Desperados/feed?access_token=" + authToken;
       var self = this;
       $.getJSON(url, function(response){
-        self.refresh(response.data);
+        
+        var posts = response.data;
+        
+        $.each(posts, function(i, item){
+          item.type = "facebook";
+          item.status = ItemStatus.UnPublished;
+        });
+        
+        self.refresh(posts);
       });
       
     }
@@ -135,6 +178,13 @@
         var self = this;
           
         twitterlib.timeline('desperados_es', this.tweetOptions, function (tweets, options) {
+          
+          
+            $.each(tweets, function(i, item){
+              item.type = "twitter";
+              item.status = ItemStatus.UnPublished;
+            });
+          
             self.refresh(tweets);
         }); 
     },
@@ -169,121 +219,6 @@
   
   var mainFeed = $("#main-feed")[0];
   
-  
-  var FlickrView = Backbone.View.extend({
-    
-    model:flickrModel,
-    el:mainFeed,
-    template:$("#flickr-list-template").html(),
-    
-    initialize:function(){
-        _.bindAll(this, 'render');
-        this.model.bind("refresh", this.render, this);
-    },
-    
-    render:function(){
-       this.el.innerHTML = _.template(this.template, {data:this.model.toJSON()});
-    }
-    
-  });
-  
-  var flickrView = new FlickrView();
-  
-  var MixCloudView = Backbone.View.extend({
-    model:mixCloudModel,
-    el:mainFeed,
-    template:$("#mixCloud-list-template").html(),
-    
-    initialize:function(){
-        _.bindAll(this, 'render');
-        this.model.bind("refresh", this.render, this);
-    },
-    
-    render:function(){
-       this.el.innerHTML = _.template(this.template, {data:this.model.toJSON()});
-    }
-
-  });
-  
-  var mixCloudView = new MixCloudView();
-  
-  var InstagramView = Backbone.View.extend({
-    model:instagramModel,
-    el:mainFeed,
-    template:$("#instgram-list-template").html(),
-    
-    
-    initialize:function(){
-        _.bindAll(this, 'render');
-        this.model.bind("refresh", this.render, this);
-    },
-    
-    render:function(){
-       this.el.innerHTML = _.template(this.template, {data:this.model.toJSON()});
-    }
-    
-  });
-  
-  var instagramView = new InstagramView();
-  
-  var TweetView = Backbone.View.extend({
-    model:tweetModel,
-    el:mainFeed,
-    template:$("#tweet-list-template").html(),
-    
-    
-    initialize:function(){
-        _.bindAll(this, 'render');
-        this.model.bind("refresh", this.render, this);
-    },
-    
-    render:function(){
-       this.el.innerHTML = _.template(this.template, {data:this.model.toJSON()});
-    }
-    
-  });
-  
-  var tweetView = new TweetView();
-  
-  
-  var WallView = Backbone.View.extend({
-    
-    el:mainFeed,
-    model:wallModel,
-    template:$("#fb-list-template").html(),
-    
-    initialize:function(){
-      _.bindAll(this, 'render');
-      this.model.bind("refresh", this.render, this);
-    },
-    
-    render:function(){
-      this.el.innerHTML = _.template(this.template, {data:this.model.toJSON()});
-    }
-    
-    
-  });
-  
-  var wallView = new WallView();
-  
-  var VideoView = Backbone.View.extend({
-    template:$("#youtube-list-template").html(),
-    el:mainFeed,
-    model:videoModel,
-    
-    initialize:function(){
-      _.bindAll(this, 'render');
-      this.model.bind("refresh", this.render, this);
-    },
-    
-    render:function(){
-      this.el.innerHTML = _.template(this.template, {data:this.model.toJSON()});
-    }
-  });
-  
-  var videoView = new VideoView();
-  
-  
   /*
    
    Link bar
@@ -294,13 +229,40 @@
   var FeedView = Backbone.View.extend({
     
     listTemplate:$("#feed-template").html(),
-    model:moderationModel,
-    itemTemplate:"",
+    model:null,
+    itemTemplates:{
+      "mixCloud":$("#mixCloud-item-template").html(),
+      "youtube":$("#youtube-item-template").html(),
+      "facebook":$("#fb-item-template").html(),
+      "twitter":$("#tweet-item-template").html(),
+      "instagram":$("#instgram-item-template").html(),
+      "flickr":$("#flickr-item-template").html()
+    },
     el:mainFeed,
+    
+    events:{
+      "click a.add-item":"addItem"
+    },
+    
     
     initialize:function(){
       _.bindAll(this, 'render');
-      this.model.bind("refresh", this.render, this);
+    },
+    
+    
+    addItem:function(e){
+      
+      var liItem = $(e.target).parent().parent();
+      
+      var index = $(this.el).find("ul li").index(liItem);
+      
+      
+      var item = this.model.at(index);
+      item.set({"status":ItemStatus.Published});
+      
+      this.render();
+      
+      moderationModel.add(item);
     },
     
     render:function(){
@@ -314,8 +276,21 @@
     },
     
     templateItem:function(data){
-      var str = _.template(this.itemTemplate, {data:data});
+      
+      var itemTemplate = this.itemTemplates[data.type];
+      var str = _.template(itemTemplate, {data:data});
       return str;
+    },
+    
+    
+    setModel:function(value){
+      
+      if(this.model != null){
+        this.model.unbind("refresh", this.render);
+      }
+      
+      this.model = value;
+      this.model.bind("refresh", this.render, this);
     }
     
     
@@ -406,33 +381,38 @@
       },
       
       getFlickr:function(){
+        feedView.setModel(flickrModel);
         flickrModel.fetch();
       },
       
       getInstagram:function(){
+        feedView.setModel(instagramModel);
         instagramModel.fetch();
       },
       
       getTweets:function(){
+        feedView.setModel(tweetModel);
         tweetModel.fetch();
       },
       
       getFacebook:function(){
+        feedView.setModel(wallModel);
         wallModel.fetch();
       },
       
       getVideos:function(){
+        feedView.setModel(videoModel);
         videoModel.fetch();
       },
       
       getMixCloud:function(){
+        
+        feedView.setModel(mixCloudModel);
         mixCloudModel.fetch();
       },
       
       getMixed:function(){
-        
-        feedView.itemTemplate = $("#basic-template").html();
-        
+        feedView.setModel(moderationModel);
         window.moderationModel.trigger("refresh");
         
       }

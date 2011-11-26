@@ -26,103 +26,67 @@
     <script type="text/template" id="feed-template">
       <ul>
 	  <% for(var k = 0; k<data.length; k++) { var item = data[k]; %>
+	  <li class="<%= item.type %>">
 	  <%= templateSub(item) %>
+	  <% if(item.status == 1) { %>
+	    <div class="edit-box">
+	      <a class="add-item">Add Item to Feed</a>
+	    </div>
+	  <% } %>
+	  </li>
 	  <% } %>
       </ul>
     </script>
     
     
-    <script id="basic-template" type="text/template">
-      <li class="tweet">
-	<div>
-	  <span class="person"><%= data.name %></span>
-	</div>
-      </li>
-    </script>
-    
-    <script id="tweet-list-template" type="text/template">
-        <ul>
-	  <% for(var k = 0; k<data.length; k++) { var tweet = data[k]; %>
-	    <li class="tweet">
-	      <div>
-		<span class="person"><%= tweet.user.name %></span>
-		<p><%= tweet.text %></p>
-		<span class="date"><%= tweet.created_at %></span>
-		<span class="link-header">Links</span>
-		<ul>
-		
-		  <% for(var j = 0; j<tweet.entities.urls.length; j++) { var url = tweet.entities.urls[j]; %>
-		    <li><a href="<%= url.display_url %>"><%= url.display_url %></a></li>	
-		  <% } %>
-		</ul>
-	      </div>
-	    </li>
-	  <% } %>
-        </ul>
-    </script>
-    
-    
-    <script id="fb-list-template" type="text/template">
-        <ul>
-	  <% for(var k = 0; k<data.length; k++) { var post = data[k]; %>
-	    <li class="facebook">This is the post: <%= post.message %> from <%= post.from.name %></li>
-	  <% } %>
-        </ul>
-    </script>
-    
-    
-    <script id="youtube-list-template" type="text/template">
-      <ul>
-	<% for(var k = 0; k<data.length; k++) { var video = data[k]; %>
-	  <li class="youtube">
+    <script id="mixCloud-item-template" type="text/template">
 	    <div>
-	      <span><%= video.title %></span>
-	      <img src="<%= video.thumbnail %>" />
+	      <span><%= data.name %></span>
+	      <img src="<%= data.pictures.medium %>" />
 	    </div>
-	  </li>
-	<% } %>
-      </ul>
-    </script>
-    
-    <script id="instgram-list-template" type="text/template">
-      <ul>
-	<% for(var k = 0; k<data.length; k++) { var pic = data[k]; %>
-	  <li class="instagram">
-	    <div>
-	      <span><%= pic.caption.text %></span>
-	      <img src="<%= pic.images.thumbnail.url %>" />
-	    </div>
-	  </li>
-	<% } %>
-      </ul>
     </script>
     
     
-    <script id="mixCloud-list-template" type="text/template">
-      <ul>
-	<% for(var k = 0; k<data.length; k++) { var mix = data[k]; %>
-	  <li class="instagram">
-	    <div>
-	      <span><%= mix.name %></span>
-	      <img src="<%= mix.pictures.medium %>" />
-	    </div>
-	  </li>
-	<% } %>
-      </ul>
+    <script id="tweet-item-template" type="text/template">
+	  <div>
+	    <span class="person"><%= data.user.name %></span>
+	    <p><%= data.text %></p>
+	    <span class="date"><%= data.created_at %></span>
+	    <span class="link-header">Links</span>
+	    <ul>
+	    
+	      <% for(var j = 0; j<data.entities.urls.length; j++) { var url = data.entities.urls[j]; %>
+		<li><a href="<%= url.display_url %>"><%= url.display_url %></a></li>	
+	      <% } %>
+	    </ul>
+	  </div>
     </script>
     
     
-    <script id="flickr-list-template" type="text/template">
-      <ul>
-	<% for(var k = 0; k<data.length; k++) { var photo = data[k]; %>
-	  <li class="flickr">
+    <script id="fb-item-template" type="text/template">
+	<div>This is the post: <%= data.message %> from <%= data.from.name %></div>
+    </script>
+    
+    
+    <script id="youtube-item-template" type="text/template">
+	  <div>
+	    <span><%= data.title %></span>
+	    <img src="<%= data.thumbnail %>" />
+	  </div>
+    </script>
+    
+    <script id="instgram-item-template" type="text/template">
 	    <div>
-	      <span><%= photo.title %></span>
-	      <img src='http://farm<%= photo.farm %>.static.flickr.com/<%= photo.server %>/<%= photo.id %>_<%= photo.secret %>_m.jpg' />
+	      <span><%= data.caption.text %></span>
+	      <img src="<%= data.images.thumbnail.url %>" />
 	    </div>
-	  </li>
-	<% } %>
-      </ul>
+    </script>
+    
+    <script id="flickr-item-template" type="text/template">
+	    <div>
+	      <span><%= data.title %></span>
+	      <img src='http://farm<%= data.farm %>.static.flickr.com/<%= data.server %>/<%= data.id %>_<%= data.secret %>_m.jpg' />
+	    </div>
     </script>
     
     <script>
@@ -163,6 +127,16 @@
 	color:#8AB833;
       }
       
+      #main-feed > ul > li div.edit-box
+      {
+	background:white;
+	padding:4px;
+	margin-top:6px;
+	cursor:pointer;
+	color: #333333;
+	text-transform:uppercase;
+      }
+      
       
       #main-feed > ul > li img
       {
@@ -175,7 +149,7 @@
 	background:#0084B0;
       }
       
-      #main-feed ul li.tweet
+      #main-feed ul li.twitter
       {
 	background:#009694;
       }
