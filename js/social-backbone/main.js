@@ -12,18 +12,28 @@
     
     user:"62767084@N06",
     apiKey:"4ccd2a64307c9f08f355cc88109f6232",
+    loaded:false,
     
     fetch:function(){
+      
+      if(this.loaded){
+        this.trigger("refresh");
+        return;
+      }
+      $(window).openBar({message:"Retreiving Flickr Stream"});
+      this.loaded = true;
       
       var url = "http://api.flickr.com/services/rest/?method=flickr.photos.search&format=json&api_key="+this.apiKey+"&thumbnail_size=sq&link_to_size=l&user_id="+this.user+"&per_page=20&jsoncallback=?"
       
       var self = this;
+      
       
       $.getJSON(url, function(response){
                 
                 var photos = response.photos.photo;
                 $.each(photos, function(i, item){
                   item.type = "flickr";
+                  item["dsp_title"] = item["dsp_tags"] = null,
                   item.status = ItemStatus.UnPublished;
                 });
                 self.refresh(photos);
@@ -40,13 +50,24 @@
     model:Backbone.Model.extend({}),
     
     tag:"beer",
-    
+    loaded:false,
     authToken:"332178.5532830.304dcae9620749e086bac69712af2051",
     
     fetch:function(){
       
+      if(this.loaded){
+        this.trigger("refresh");
+        return;
+      }
+      $(window).openBar({message:"Retreiving Instagram Stream"});
+      this.loaded = true;
+      
       var url = 'https://api.instagram.com/v1/tags/' + this.tag + '/media/recent?count=20&access_token=' + this.authToken;
       var self = this;
+      
+      
+      $(window).openBar({message:"Retreiving Flickr Stream"});
+      this.loaded = true;
       
       $.ajax(
             {
@@ -58,6 +79,7 @@
                 
                 $.each(photos, function(i, item){
                   item.type = "instagram";
+                  item["dsp_title"] = item["dsp_tags"] = null,
                   item.status = ItemStatus.UnPublished;
                 });
                 self.refresh(photos);
@@ -74,8 +96,17 @@
     model:Backbone.Model.extend({}),
     
     filter:"wild",
+    loaded:false,
     
     fetch:function(){
+      
+      
+      if(this.loaded){
+        this.trigger("refresh");
+        return;
+      }
+      $(window).openBar({message:"Retreiving MixCloud Stream"});
+      this.loaded = true;
       
       var search = encodeURIComponent(this.filter);
       
@@ -88,6 +119,7 @@
         
         $.each(mixes, function(i, item){
           item.type = "mixCloud";
+          item["dsp_title"] = item["dsp_tags"] = null,
           item.status = ItemStatus.UnPublished;
         });
         
@@ -102,8 +134,19 @@
   var VideoCollection = Backbone.Collection.extend({
     
     model:Backbone.Model.extend({}),
-    
+    loaded:false,
     fetch:function(){
+      
+      
+      
+      if(this.loaded){
+        this.trigger("refresh");
+        return;
+      }
+      $(window).openBar({message:"Retreiving YouTube Stream"});
+      this.loaded = true;
+      
+      
       var self = this;
       $.jTube({
               request: 'user',
@@ -116,6 +159,7 @@
                 
                 $.each(videos, function(i, item){
                   item.type = "youtube";
+                  item["dsp_title"] = item["dsp_tags"] = null,
                   item.status = ItemStatus.UnPublished;
                 });
                 
@@ -141,9 +185,18 @@
       
     }),
     
+    authToken:"AAACEdEose0cBAJkRwgQZBWd88Ii9Au91svILwoZBtRPiC31gydaEuciI60yjMpbI1IZCbX5sVNb6enCqryMar84J4eZCjo5teAeKsxVO7wZDZD",
+    loaded:false,
     fetch:function(){
-      var authToken = "AAACEdEose0cBAJkRwgQZBWd88Ii9Au91svILwoZBtRPiC31gydaEuciI60yjMpbI1IZCbX5sVNb6enCqryMar84J4eZCjo5teAeKsxVO7wZDZD";
-      var url = "https://graph.facebook.com/Desperados/feed?access_token=" + authToken;
+      
+      if(this.loaded){
+        this.trigger("refresh");
+        return;
+      }
+      $(window).openBar({message:"Retreiving Facebook Stream"});
+      this.loaded = true;
+      
+      var url = "https://graph.facebook.com/Desperados/feed?access_token=" + this.authToken;
       var self = this;
       $.getJSON(url, function(response){
         
@@ -151,6 +204,7 @@
         
         $.each(posts, function(i, item){
           item.type = "facebook";
+          item["dsp_title"] = item["dsp_tags"] = null,
           item.status = ItemStatus.UnPublished;
         });
         
@@ -164,7 +218,7 @@
   var TweetCollection = Backbone.Collection.extend({
     
     tweetOptions:{},
-    
+    loaded:false,
     model:Backbone.Model.extend({
       
       getDate:function(){
@@ -175,6 +229,13 @@
     
     fetch:function(){
         
+        if(this.loaded){
+        this.trigger("refresh");
+        return;
+      }
+      $(window).openBar({message:"Retreiving Twitter Stream"});
+      this.loaded = true;
+        
         var self = this;
           
         twitterlib.timeline('desperados_es', this.tweetOptions, function (tweets, options) {
@@ -182,6 +243,7 @@
           
             $.each(tweets, function(i, item){
               item.type = "twitter";
+              item["dsp_title"] = item["dsp_tags"] = null,
               item.status = ItemStatus.UnPublished;
             });
           
@@ -230,6 +292,7 @@
     
     listTemplate:$("#feed-template").html(),
     model:null,
+    editTemplate:"",
     itemTemplates:{
       "mixCloud":$("#mixCloud-item-template").html(),
       "youtube":$("#youtube-item-template").html(),
@@ -241,13 +304,33 @@
     el:mainFeed,
     
     events:{
-      "click a.add-item":"addItem"
+      "click a.add-item":"addItem",
+      "click a.remove-item":"removeItem",
+      'click .edit-box .save-edit':"saveEdit"
     },
     
     
     initialize:function(){
       _.bindAll(this, 'render');
     },
+    
+    saveEdit:function(e){
+      
+      var liItem = $(e.target).parent().parent().parent();
+      
+      var nTitle = liItem.find("input[name='title']").val();
+      var nTags = liItem.find("input[name='tags']").val();
+      
+      var index = $(this.el).find("ul li").index(liItem);
+      
+      var item = this.model.at(index);
+      item.set({"dsp_title":nTitle, "dsp_tags":nTags});
+      
+      $(window).openBar({message:"Changes saved"});
+      
+      this.render();
+    },
+    
     
     
     addItem:function(e){
@@ -263,12 +346,36 @@
       this.render();
       
       moderationModel.add(item);
+      
+      $(window).openBar({message:"Item added to main stream"});
+      
+    },
+    
+    
+    removeItem:function(e){
+      var liItem = $(e.target).parent().parent();
+      
+      var index = $(this.el).find("ul li").index(liItem);
+      
+      
+      var item = this.model.at(index);
+      item.set({"status":ItemStatus.UnPublished});
+      
+      var mItem = moderationModel.getByCid(item.cid);
+      moderationModel.remove([mItem]);
+      
+      $(window).openBar({message:"Item removed from stream"});
+      
+      this.render();
+      
     },
     
     render:function(){
       var self = this;
       this.el.innerHTML = _.template(this.listTemplate,
-                                     {data:this.model.toJSON(),
+                                     {editTemplate:function(item){
+                                        return _.template(self.editTemplate, item)
+                                     }, data:this.model.toJSON(),
                                       templateSub:function(item){
                                         return self.templateItem(item);
                                       }
@@ -304,20 +411,20 @@
     model: Backbone.Model.extend({ }),
     
     fetch:function(opts){
-        var links = [{link:"Get Moderated", route:"#mixed"},
-                     {link:"Get Tweets", route:"#tweet"},
-                     {link:"Get Facebook", route:"#facebook"},
-                     {link:"Get Instagram (beer)", route:"#instagram"},
-                     {link:"Get MixCloud (wild)", route:"#mixcloud"},
-                     {link:"Get Flickr", route:"#flickr"},
-                     {link:"Get YouTube", route:"#video"}];
+        var links = [{link:"Show Main Stream", route:"#mixed"},
+                     {link:"Moderate Twitter", route:"#tweet"},
+                     {link:"Moderate Facebook", route:"#facebook"},
+                     {link:"Moderate Instagram (beer)", route:"#instagram"},
+                     {link:"Moderate MixCloud (wild)", route:"#mixcloud"},
+                     {link:"Moderate Flickr", route:"#flickr"},
+                     {link:"Moderate YouTube", route:"#video"}];
         
         this.refresh(links);
     }
     
   });
   
-  window.tweetModel = tweetModel;
+  
   
   var linkModel = new LinksCollection();
   
@@ -366,6 +473,70 @@
   
   
   
+  var FacebookController = {
+    
+    appId:"281703041866195",
+    
+    attachScript:function(){
+      /// Load the SDK Asynchronously
+      (function(d){
+         var js, id = 'facebook-jssdk'; if (d.getElementById(id)) {return;}
+         js = d.createElement('script'); js.id = id; js.async = true;
+         js.src = "//connect.facebook.net/en_US/all.js";
+         d.getElementsByTagName('head')[0].appendChild(js);
+       }(document));
+      ///
+    },
+    
+    initialized:false,
+    
+    checkToken:function(cb){
+      
+      var self = this;
+      
+      if(self.initialized){
+        self.login(cb);
+        return;
+      }
+      
+      window.fbAsyncInit = function() {
+        
+        ///
+        FB.init({
+            appId      : self.appId, // App ID
+            channelURL : '//localhost:8888/code/enzuguri-sandbox/js/social-backbone/channel.html', // Channel File
+            status     : true, // check login status
+            cookie     : true, // enable cookies to allow the server to access the session
+            oauth      : true // enable OAuth 2.0
+        });
+        ///  
+        
+        self.initialized = true;
+          
+        self.login(cb); 
+      };
+      
+      self.attachScript();
+    },
+    
+    
+    login:function(cb){
+      ///
+        FB.login(function(response) {
+          if (response.authResponse) {
+            wallModel.authToken = response.authResponse.accessToken;
+            cb();
+          } else {
+            
+          }
+        }, {scope: ''});
+        /// 
+    }
+  
+    
+  }
+  
+  
   var AppRouter = Backbone.Controller.extend({
     
       routes:{
@@ -381,37 +552,45 @@
       },
       
       getFlickr:function(){
+        feedView.editTemplate = $("#edit-template").html();
         feedView.setModel(flickrModel);
         flickrModel.fetch();
       },
       
       getInstagram:function(){
+        feedView.editTemplate = $("#edit-template").html();
         feedView.setModel(instagramModel);
         instagramModel.fetch();
       },
       
       getTweets:function(){
+        feedView.editTemplate = $("#edit-template").html();
         feedView.setModel(tweetModel);
         tweetModel.fetch();
       },
       
       getFacebook:function(){
+        feedView.editTemplate = $("#edit-template").html();
         feedView.setModel(wallModel);
-        wallModel.fetch();
+        FacebookController.checkToken(function(){
+          wallModel.fetch();
+        });
       },
       
       getVideos:function(){
+        feedView.editTemplate = $("#edit-template").html();
         feedView.setModel(videoModel);
         videoModel.fetch();
       },
       
       getMixCloud:function(){
-        
+        feedView.editTemplate = $("#edit-template").html();  
         feedView.setModel(mixCloudModel);
         mixCloudModel.fetch();
       },
       
       getMixed:function(){
+        feedView.editTemplate = $("#display-template").html();
         feedView.setModel(moderationModel);
         window.moderationModel.trigger("refresh");
         
@@ -419,13 +598,13 @@
       
     
     });
+    
+    
+    var router = new AppRouter();
   
-  
-  var router = new AppRouter();
-  
-  Backbone.history.start();
-  
-  
+    Backbone.history.start();
+    
+    $(window).openBar({message:"Welcome"});  
     
   
 })(jQuery);

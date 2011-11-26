@@ -3,13 +3,16 @@
   <head>
     <meta charset="utf-8">
     <title>hello-backbonejs</title>
+    <link rel="stylesheet" href="jbar.css"/>
   </head>
   <body>
     
+    <div id="fb-root"></div>
     
-    <div id="link-bar"></div>
-    <div id="main-feed"></div>
-    
+    <div class="content">    
+      <div id="link-bar"></div>
+      <div id="main-feed"></div>
+    </div>
     
     <script type="text/template" id="link-bar-template">
 	<ul>
@@ -17,8 +20,6 @@
             <li class="link-item"><a href="<%= link.route %>"><%= link.link %></a></li>
             <% } %>
         </ul>
-	<input type="text" id="search-input"/>
-	<input type="button" id="search-button" value="search"/>
     </script>
     
     
@@ -28,14 +29,37 @@
 	  <% for(var k = 0; k<data.length; k++) { var item = data[k]; %>
 	  <li class="<%= item.type %>">
 	  <%= templateSub(item) %>
-	  <% if(item.status == 1) { %>
-	    <div class="edit-box">
-	      <a class="add-item">Add Item to Feed</a>
-	    </div>
-	  <% } %>
+	  <div class="edit-box">
+	    <% if(item.status == 1) { %>	    
+		<a class="add-item">Add Item to Feed</a>
+	    <% } else { %>
+		<%= editTemplate(item) %>    
+	    <% } %>
+	  </div>
 	  </li>
 	  <% } %>
       </ul>
+    </script>
+    
+    
+    <script type="text/template" id="display-template">
+      <% if(dsp_title != null) {  %>
+	<%= dsp_title %>
+	<br/>
+	<%= dsp_tags %>
+      <% } %>
+      
+    </script>
+    
+    <script type="text/template" id="edit-template">
+      <a class="remove-item">Remove Item from Feed</a>
+      <form>
+	<label for="name">Optional Title</label>
+	<input type="text" name="title" value="<%= dsp_title %>"/>
+	<label for="tags">Optional tags</label>
+	<input type="text" name="tags" value="<%= dsp_tags %>"/>
+	<input type="button" value="Save Edits" class="save-edit"/>
+      </form>
     </script>
     
     
@@ -77,7 +101,9 @@
     
     <script id="instgram-item-template" type="text/template">
 	    <div>
-	      <span><%= data.caption.text %></span>
+	      <% if(data.caption != null) { %>
+		<span><%= data.caption.text %></span>
+	      <% } %>
 	      <img src="<%= data.images.thumbnail.url %>" />
 	    </div>
     </script>
@@ -107,6 +133,10 @@
     
     <style>
       
+      #link-bar{
+	clear:left;
+      }
+      
       #main-feed ul
       {
 	list-style:none;
@@ -122,7 +152,7 @@
 	padding:8px;
 	margin-right:8px;
 	margin-bottom: 8px;
-	width: 220px;
+	width: 200px;
 	min-height: 220px;
 	color:#8AB833;
       }
@@ -130,11 +160,26 @@
       #main-feed > ul > li div.edit-box
       {
 	background:white;
-	padding:4px;
 	margin-top:6px;
-	cursor:pointer;
-	color: #333333;
+      }
+      
+      #main-feed > ul > li div.edit-box a{
+	
 	text-transform:uppercase;
+	border:1px solid #888888;
+	color:#888888;
+	cursor:pointer;
+	padding:1px;
+	
+      }
+      
+      #main-feed > ul > li div.edit-box input
+      {
+	clear: left;
+	display: block;
+	padding: 4px 0px;
+	width: 190px;
+	margin: 0px 10px;	
       }
       
       
@@ -171,10 +216,24 @@
       }
       
       
+      .content{
+	      background-color:#fff;
+	      border:1px solid #ccc;
+	      width:700px;
+	      margin: 20px auto;
+	      padding:0px;
+      }
+      
+      body{
+	      background-color: #211F20;
+	      font-family:'Lucida Grande',sans-serif;
+	      color:#777;
+	      margin:0px;
+	      padding:20px 0 0 0;
+      }      
           
     
     </style>
-    
     
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
     <script src="http://ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js"></script>
@@ -183,6 +242,10 @@
     
     <script src="twitterlib.min.js" type="text/javascript"></script>
     <script src="jquery.jTube-2.0.0.min.js" type="text/javascript"></script>
+    <script src="jquery.bar.js" type="text/javascript"></script>
     <script src="main.js" type="text/javascript"></script>
+    
+    
+    
   </body>
   </html>
