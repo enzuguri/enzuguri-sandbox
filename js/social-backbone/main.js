@@ -21,7 +21,7 @@
         return;
       }
       $(window).openBar({message:"Retreiving Flickr Stream"});
-      this.loaded = true;
+      
       
       var url = "http://api.flickr.com/services/rest/?method=flickr.photos.search&format=json&api_key="+this.apiKey+"&thumbnail_size=sq&link_to_size=l&user_id="+this.user+"&per_page=20&jsoncallback=?"
       
@@ -29,7 +29,7 @@
       
       
       $.getJSON(url, function(response){
-                
+                self.loaded = true;
                 var photos = response.photos.photo;
                 $.each(photos, function(i, item){
                   item.type = "flickr";
@@ -106,7 +106,7 @@
         return;
       }
       $(window).openBar({message:"Retreiving MixCloud Stream"});
-      this.loaded = true;
+      
       
       var search = encodeURIComponent(this.filter);
       
@@ -114,7 +114,7 @@
       var self = this;
       
       $.ajax({url:url, dataType:"jsonp", success:function(response){
-        
+        self.loaded = true;
         var mixes = response.data;
         
         $.each(mixes, function(i, item){
@@ -229,17 +229,18 @@
     
     fetch:function(){
         
-        if(this.loaded){
+      if(this.loaded){
         this.trigger("refresh");
         return;
       }
       $(window).openBar({message:"Retreiving Twitter Stream"});
-      this.loaded = true;
+      
         
         var self = this;
           
         twitterlib.timeline('desperados_es', this.tweetOptions, function (tweets, options) {
-          
+          	
+			self.loaded = true;
           
             $.each(tweets, function(i, item){
               item.type = "twitter";

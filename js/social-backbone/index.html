@@ -134,15 +134,18 @@
     <style>
       
       #link-bar{
-	clear:left;
+		clear:left;
       }
       
-      #main-feed ul
+      #main-feed > ul
       {
-	list-style:none;
-	padding:0;
-	margin:0;
-	width:800px;
+		list-style:none;
+		padding:0;
+		margin:0;
+		width:100%;
+		background:white;
+		margin-top:16px;
+		float:left;
       }
       
       
@@ -150,69 +153,77 @@
       {
 	float:left;
 	padding:8px;
-	margin-right:8px;
-	margin-bottom: 8px;
-	width: 200px;
+	margin:6px;
+	width: 205px;
 	min-height: 220px;
-	color:#8AB833;
+	color:white;
       }
       
       #main-feed > ul > li div.edit-box
       {
-	background:white;
-	margin-top:6px;
+		    margin-top: 6px;
+		    padding: 2px;
       }
       
       #main-feed > ul > li div.edit-box a{
 	
-	text-transform:uppercase;
-	border:1px solid #888888;
-	color:#888888;
-	cursor:pointer;
-	padding:1px;
+			background: none repeat scroll 0 0 #F26700;
+		    cursor: pointer;
+		    display: inline-block;
+		    font-size: 13px;
+		    margin: 2px;
+		    padding: 3px;
+		    text-transform: uppercase;
 	
       }
       
       #main-feed > ul > li div.edit-box input
       {
-	clear: left;
-	display: block;
-	padding: 4px 0px;
-	width: 190px;
-	margin: 0px 10px;	
+		clear: left;
+		display: block;
+		padding: 4px 0px;
+		width: 190px;
+		margin: 0px 10px;	
       }
       
       
       #main-feed > ul > li img
       {
-	display:block;
-	clear:left;
+		display:block;
+		clear:left;
+		margin: 6px auto;
       }
       
       #main-feed ul li.facebook
       {
-	background:#0084B0;
+		background:#0084B0;
       }
       
       #main-feed ul li.twitter
       {
-	background:#009694;
+		background:#63BFB6;
+      }
+
+	  #main-feed ul li.mixCloud
+      {
+		background:#64BF4B;
+		height:auto;
       }
       
       #main-feed ul li.youtube
       {
-	background:#731010;
+		background:#F21D2F;
       }
       
       #main-feed ul li.instagram
       {
-	background:#0B5926;
+		background:#BFB276;
       }
       
       #main-feed ul li.flickr
       {
-	background:#FF7000;
-	width: auto;
+		background:#BF52BF;
+		width: auto;
       }
       
       
