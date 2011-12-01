@@ -2,6 +2,15 @@
     
     <head>
         <style type="text/css">
+            
+            #spinner{
+                
+                width:auto;
+                border: 1px solid black;
+                height:54px;
+                float:left;
+            }
+            
             #spinner > div > ul
             {
                 position:relative;
@@ -20,6 +29,7 @@
                 height:54px;
                 float:left;
                 margin-left:10px;
+                border-right: 1px solid black;
             }
             
             #spinner > div.win-line
@@ -32,6 +42,10 @@
                 opacity:0.3;
             }
             
+            #panel{
+                clear:left;
+            }
+            
         </style>
         
     </head>
@@ -40,44 +54,33 @@
         
         
         <div id="spinner">
-            <div id="tech">
-                <ul>
-                    <li>Kinect</li>
-                    <li>Bluetooth</li>
-                    <li>RDFID</li>
-                    <li>Geo-Location</li>
-                    <li>Facebook</li>
-                    <li>Twitter</li>
-                </ul>   
-            </div>
-            <div id="brand">
-                <ul>
-                    <li>Confectionary</li>
-                    <li>Liquer</li>
-                    <li>Beer</li>
-                    <li>Health Food</li>
-                    <li>DJ</li>
-                    <li>Rock band</li>
-                    <li>Pop Artist</li>
-                </ul>   
-            </div>
-            <div id="market">
-                <ul>
-                    <li>Kids</li>
-                    <li>Teens - Both</li>
-                    <li>Teens - Females</li>
-                    <li>Teens - Males</li>
-                </ul>   
-            </div>
-            <div class="win-line"></div>
+            
+            
+        </div>
+        <div id="panel">
+            
+            
         </div>
         
+        <script type="text/template" id="view-template">
+            <% for(var i = 0; i < data.length; i++) { var item = data[i]; %>
+                <div id="<%= item.name %>">
+                    <ul>
+                        <% for(var j = 0; j < item.data.length; j++) { var liItem = item.data[j]; %>
+                            <li><%= liItem %></li>
+                        <% } %>                
+                    </ul>
+                </div>        
+            <% } %>
+            <div class="win-line"></div>
+        </script>
         
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
         <script src="http://ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js"></script>
         <script src="http://ajax.cdnjs.com/ajax/libs/underscore.js/1.1.6/underscore-min.js"></script>
         <script src="http://ajax.cdnjs.com/ajax/libs/backbone.js/0.3.3/backbone-min.js"></script>   
         
+        <script src="data.js"></script>
         <script src="main.js"></script>
         
         

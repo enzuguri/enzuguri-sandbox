@@ -68,6 +68,8 @@
     
     
     start:function(distance){
+        this.velocity = 0;
+        this.offset = 0;
         this.running = true;
         this.acceleration = this.startAcceleration;
     },
@@ -81,6 +83,7 @@
     
     kill:function(){
       this.running = false;
+      this.trigger("killed");
       //this.beacon.unbind("enterFrame", this.updateFunc);
       this.list.css({"top":-this.maxHeight+"px"});
     },
@@ -139,29 +142,133 @@
     
     
   });
+   
+  
+  
+  var TumblerCollection = Backbone.Collection.extend({
+    model:Backbone.Model.extend({}),
+    
+    initialize:function(){
+      this.refresh(window.tumbleData.sets);
+    }
+  })
+  
+  
+  
+  var MainView = Backbone.View.extend({
+    
+    tumblers:[],
+    
+    initialize:function(){
+      this.collection.bind("refresh", this.render, this);
+      this.render();
+    },
+    
+    render:function(){
+      
+      var json = this.collection.toJSON();
+      
+      var template = $("#view-template").html();
+        
+      this.el.innerHTML = _.template(template, {data:json});
+      
+      
+      var self = this;
+      
+      $(this.el).find("div").each(function(i, el){
+        self.tumblers[i] = new TumblerView({el:el});
+      });
+      
+      var len = this.tumblers.length;
+      
+      this.tumblers[len-1].bind("killed", function(){
+        self.trigger("end");
+      });
+    },
+    
+    getTumblerValues:function(){
+      
+      var values = [];
+      
+      
+      $(this.el).find("div ul").each(function(i, el){
+        
+        var li = $(this).find("li:eq(2)");
+        values[i] = li.text();
+      });
+      
+      return values;
+    },
+    
+    
+    tumble:function(){
+      
+      var len = this.tumblers.length;
+      var self = this;
+      $.each(this.tumblers, function(i,el){
+    
+        var startTime = i * 480;
+        var endTime = 900;
+        
+        setTimeout(function(){
+          el.start()
+          
+          setTimeout(function(){
+            el.stop();
+          }, endTime);
+          
+        }, startTime)
+      });
+      
+    }
+    
+    
+  });
+  
+  
+  var view = new MainView({collection:new TumblerCollection(), el:$("#spinner")[0]});
+  
+  
+  var Panel = Backbone.View.extend({
+    
+    disp:view,
+    
+    events:{
+      "click a":"respin"
+    },
+    
+    
+    initialize:function(){
+      
+      var self = this;
+      
+      this.disp.bind("end", function(){
+        self.render();
+      });
+      
+      this.disp.tumble();
+    },
+    
+    
+    render:function(){
+      
+      this.el.innerHTML = _.template(window.tumbleData.template, {data:this.disp.getTumblerValues()});
+    },
+    
+    respin:function(e){
+      
+      this.disp.tumble();
+      return false;
+    }
+    
+    
+  });
+  
+  
+  var panel = new Panel({disp:view, el:$("#panel")[0]});
   
 
-  var techTumblr = new TumblerView({el:$("#tech")[0]});
-  var brandTumblr = new TumblerView({el:$("#brand")[0]});
-  var marketTumblr = new TumblerView({el:$("#market")[0]});
   
-  var tumblers = [techTumblr,brandTumblr,marketTumblr];
-  
-  
-  $.each(tumblers, function(i,el){
-    
-    var startTime = i * 480;
-    var endTime = 900;
-    
-    setTimeout(function(){
-      el.start()
-      
-      setTimeout(function(){
-        el.stop();
-      }, endTime);
-      
-    }, startTime)
-  });
   
   
 })(jQuery);
