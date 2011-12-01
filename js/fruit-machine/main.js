@@ -16,9 +16,17 @@
     
     initialize:function(){
       
-      //bind frame
-      window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
-                               window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
+    // shim layer with setTimeout fallback
+    window.requestAnimationFrame = (function(){
+      return  window.requestAnimationFrame       || 
+              window.webkitRequestAnimationFrame || 
+              window.mozRequestAnimationFrame    || 
+              window.oRequestAnimationFrame      || 
+              window.msRequestAnimationFrame     || 
+              function(/* function */ callback, /* DOMElement */ element){
+                window.setTimeout(callback, 1000 / 60);
+              };
+    })();
       
       this.activate();
     }
@@ -215,7 +223,7 @@
           
           setTimeout(function(){
             el.stop();
-          }, endTime);
+          }, 800 + (Math.random() * 600));
           
         }, startTime)
       });

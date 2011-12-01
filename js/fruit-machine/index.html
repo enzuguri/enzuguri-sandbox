@@ -7,26 +7,32 @@
                 
                 width:auto;
                 border: 1px solid black;
-                height:54px;
+                height:102px;
                 float:left;
             }
             
             #spinner > div > ul
             {
                 position:relative;
-                top:-18px;
-                padding: 0px 10px;
+                top:-34px;
+                padding: 0px 4px;
                 margin:0px;
             }
             
             #spinner > div > ul > li
             {
-                height:18px;
+                height:34px;
+                z-index:0;
+            }
+            
+            #spinner > div > ul > li > p{
+                margin-left:40px;
+                padding-top:6px;
             }
             
             #spinner > div{
                 overflow:hidden;
-                height:54px;
+                height:102px;
                 float:left;
                 margin-left:10px;
                 border-right: 1px solid black;
@@ -35,7 +41,7 @@
             #spinner > div.win-line
             {
                 position:absolute;
-                top:34px;
+                top:58px;
                 height:2px;
                 width:100%;
                 background:black;
@@ -66,8 +72,8 @@
             <% for(var i = 0; i < data.length; i++) { var item = data[i]; %>
                 <div id="<%= item.name %>">
                     <ul>
-                        <% for(var j = 0; j < item.data.length; j++) { var liItem = item.data[j]; %>
-                            <li><%= liItem %></li>
+                        <% for(var j = 0; j < item.data.length; j++) { var liItem = item.data[j]; var ran = Math.floor(Math.random() * 5); %>
+                            <li><img src="icons.jpg" style="clip:rect(0px, <%= (ran+1) * 35 %>px, 34px, <%= ran * 35 %>px); position:absolute; margin-left:<%= ran * -35 %>px;"/><p><%= liItem %></p></li>
                         <% } %>                
                     </ul>
                 </div>        
