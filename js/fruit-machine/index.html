@@ -2,18 +2,36 @@
     
     <head>
         <style type="text/css">
-            #spinner > ul
+            #spinner > div > ul
             {
                 position:relative;
-                top:0px;
-                padding:0px;
+                top:-18px;
+                padding: 0px 10px;
+                margin:0px;
+            }
+            
+            #spinner > div > ul > li
+            {
+                height:18px;
+            }
+            
+            #spinner > div{
                 overflow:hidden;
                 height:54px;
                 float:left;
-                padding: 0px 10px;
-                margin-left: 10px;
-                
+                margin-left:10px;
             }
+            
+            #spinner > div.win-line
+            {
+                position:absolute;
+                top:34px;
+                height:2px;
+                width:100%;
+                background:black;
+                opacity:0.3;
+            }
+            
         </style>
         
     </head>
@@ -22,29 +40,36 @@
         
         
         <div id="spinner">
-            <ul id="tech">
-                <li>Kinect</li>
-                <li>Bluetooth</li>
-                <li>RDFID</li>
-                <li>Geo-Location</li>
-                <li>Facebook</li>
-                <li>Twitter</li>
-            </ul>
-            <ul id="brand">
-                <li>Confectionary</li>
-                <li>Liquer</li>
-                <li>Beer</li>
-                <li>Health Food</li>
-                <li>DJ</li>
-                <li>Rock band</li>
-                <li>Pop Artist</li>
-            </ul>
-            <ul id="market">
-                <li>Kids</li>
-                <li>Teens - Both</li>
-                <li>Teens - Females</li>
-                <li>Teens - Males</li>
-            </ul>
+            <div id="tech">
+                <ul>
+                    <li>Kinect</li>
+                    <li>Bluetooth</li>
+                    <li>RDFID</li>
+                    <li>Geo-Location</li>
+                    <li>Facebook</li>
+                    <li>Twitter</li>
+                </ul>   
+            </div>
+            <div id="brand">
+                <ul>
+                    <li>Confectionary</li>
+                    <li>Liquer</li>
+                    <li>Beer</li>
+                    <li>Health Food</li>
+                    <li>DJ</li>
+                    <li>Rock band</li>
+                    <li>Pop Artist</li>
+                </ul>   
+            </div>
+            <div id="market">
+                <ul>
+                    <li>Kids</li>
+                    <li>Teens - Both</li>
+                    <li>Teens - Females</li>
+                    <li>Teens - Males</li>
+                </ul>   
+            </div>
+            <div class="win-line"></div>
         </div>
         
         
