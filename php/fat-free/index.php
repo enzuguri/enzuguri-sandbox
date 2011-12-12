@@ -7,7 +7,7 @@ F3::set("DB", new DB(
 		'root',
 		'root'
 	));
-F3::set('CACHE',TRUE);
+F3::set('CACHE',FALSE);
 F3::set('DEBUG',-1);
 F3::set('UI','ui/');
 F3::set('IMPORTS','inc/');
@@ -56,6 +56,14 @@ F3::route('GET /',
 );
 //F3::route('GET /users','users.php');
 f3::map("/users", "User");
+f3::map("/mail", "Mail");
+f3::route("GET /require", function(){
+    
+    
+    echo Template::serve("header.html");
+    
+    
+});
 
 F3::run();
 
