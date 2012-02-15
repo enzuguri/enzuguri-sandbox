@@ -5,8 +5,7 @@
     UnPublished:1
   }
   
-  
-  
+    
   var FlickrCollection = Backbone.Collection.extend({
     model:Backbone.Model.extend({}),
     
@@ -43,7 +42,7 @@
     }
     
   });
-  
+
   
   var InstagramCollection = Backbone.Collection.extend({
     

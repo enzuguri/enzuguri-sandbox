@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>untitled</title>
+	<meta name="generator" content="TextMate http://macromates.com/">
+	<meta name="author" content="Alexander Fell">
+	<!-- Date: 2012-01-10 -->
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+	<script>
+	  
+	
+		$(function(){
+			
+			var socket = io.connect('http://localhost');
+			
+			
+			socket.on("play", function(data){
+				
+				console.log("this should play spotify");
+				
+				$("#message-list").append("<li>Play clicked</li>");
+				
+				
+			});
+			
+			$("#click-button").click(function(e){
+				
+				socket.emit("play-clicked", {});
+				
+			});
+			
+			socket.emit("join", {client:"web"});
+			
+		});
+	
+	</script>
+</head>
+<body>
+	<div><p>Some text here</p></div>
+	<a href="#" id="click-button">Click this for magic</a>
+	<ul id="message-list"></ul>
+</body>
+</html>
