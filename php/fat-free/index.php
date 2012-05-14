@@ -65,6 +65,31 @@ f3::route("GET /require", function(){
     
 });
 
+
+f3::route("GET /facebook/@authToken", function(){
+
+	$token = f3::get('PARAMS["authToken"]');
+
+
+
+    $ch = curl_init("https://graph.facebook.com/me?access_token=".$token);
+    curl_setopt($ch, CURLOPT_HEADER, 0);
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    $output = curl_exec($ch);       
+    curl_close($ch);
+
+    echo "hello=".$output;
+
+
+	/*
+	https://graph.facebook.com/me?access_token=116122545078207|2.1vGZASUSFMHeMVgQ_9P60Q__.3600.1272535200-500880518|QXlU1XfJR1mMagHLPtaMjJzFZp4.
+	http://localhost:8888/code/enzuguri-sandbox/php/fat-free/facebook?authToken=
+	https://graph.facebook.com/me?access_token=AAAEANRmZBGdMBABBr90CUlEVeV14WadGwL2xcqskH4fivRmN36ntLepKyXza3BycMZCuxVqaZA9w3yPD9ZAhl88CpVluNKxAfr0p9jdMGgZDZD
+	*/
+});
+
+
 F3::run();
 
 ?>

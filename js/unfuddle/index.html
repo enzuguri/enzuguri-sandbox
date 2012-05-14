@@ -1,0 +1,42 @@
+<html>
+
+<head>
+	<script src="base64.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+
+	<script>
+
+		$(function(){
+
+
+		$.ajax({
+			url:"https://analogfolk.unfuddle.com/api/v1/projects.xml",
+			headers:[ "Authorization", "Basic " + Base64.encode('alexfell:P2Psqr'), "Authorization", "Accept", "application/xml" ],
+			success:function(data){
+				console.log(data);	
+			}
+		});
+
+		/*
+
+		curl -i -u alexfell:P2Psqr -X GET \
+  -H 'Accept: application/xml' \
+  'http://analogfolk.unfuddle.com/api/v1/projects.xml'
+		
+
+curl -i -u alexfell:P2Psqr -X GET  "http://mysubdomain.unfuddle.com/api/v1/projects.xml"
+
+
+
+		*/	
+
+
+		});
+
+
+	</script>
+
+</head>
+
+
+</html>
