@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Backbone Context</title>
+    <link rel="stylesheet" type="text/css" href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css"/>
+
+</head>
+<body>
+
+
+    <div class="container">
+
+        <div class="row">
+            <div class="span12">
+                <form class="well form-inline">
+                    <label class="checkbox">Target Country</label>
+                    <input id="birds" type="text" class="input-large" placeholder="Country" />
+                    <label class="checkbox">Since Date</label>
+                    <input type="text" id="datepicker" class="input-small">
+                </form>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="span12">
+                <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Type</th>
+                      <th>Message</th>
+                      <th>attachment</th>
+                    </tr>
+                  </thead>
+                  <tbody id="market-data">
+                   
+                  </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <script type="text/template" id="market-data-template">
+
+        <% for(var i = 0; i<data.length; i++) { var item = data[i]; var d = new Date(item.updated_time * 1000); %>
+            <tr>
+                <td>
+                    <%= d.getDate() %>/<%=(d.getMonth() + 1)%>/<%=d.getYear()%>
+                    <br/>
+                    <%= d.getHours() %>:<%=d.getMinutes()%>
+                </td>
+                <td><%= item.type %></td> 
+                <td><%= item.message %></td>
+                <td>
+                    <% switch(item.type) {
+                        case "photo":
+                    %>
+                        <img style="width:120px; height:auto" src="<%= item.picture %>"/>
+                    <%    
+                        break;
+                        case "swf":
+                    %>
+                        <img style="width:120px; height:auto" src="<%= item.picture %>"/>
+                    <% 
+                        break;
+                        default:
+                    %>  
+                        No data
+                    <% 
+                        break;
+                        } 
+                    %>
+                </td>
+            </tr>
+        <% } %>
+
+    </script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
+    <script src="http://code.jquery.com/ui/1.8.19/jquery-ui.min.js"></script>
+    <script src="http://ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js"></script>
+    <script src="http://documentcloud.github.com/underscore/underscore-min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/backbone.js/0.9.2/backbone-min.js"></script>
+    <script src="social-mixin.js"></script>
+
+    <style>
+    .ui-autocomplete-loading { background: white url('images/ui-anim_basic_16x16.gif') right center no-repeat; }
+    </style>
+    <script>
+    $(function() {
+
+
+
+        var feedy = new FeedModel({actorId:"128827277157119",accessToken:"AAADD5bstFV0BAKDemvloilkLnhbrNqXXPjAazTm6HP6AedekaN036NZB8Ve4ONSHQQAflwmaMIf7fgi3LunIu8AB6dEI6IMJnapGW8AZDZD"});
+        
+
+        window.Feed = feedy;
+
+
+        var MarketDataView = Backbone.View.extend({
+
+            initialize:function(){
+                this.model.bind("reset", this.render, this);
+            },
+
+            render:function(){
+                var tmp = this.options.template;
+                var data = this.model.toJSON();
+
+                console.log(data);
+
+                this.el.innerHTML = _.template(tmp, {data:data});
+            }
+
+        });
+
+
+        var listView = new MarketDataView({model:feedy, el:$("#market-data"), template:$("#market-data-template").html()});
+
+
+
+        $( "#datepicker" ).datepicker({
+            onClose: function(dateText, inst) { 
+                var d  = new Date(dateText);
+                console.log(d, d.getTime() / 1000); 
+            }
+        });
+
+        $( "#birds" ).autocomplete({
+            source: ["United Kingdom", "Ireland", "Spain", "Germany"],
+            minLength: 2,
+            select: function( event, ui ) {
+                console.log( ui.item ?
+                    "Selected: " + ui.item.value :
+                    "Nothing selected, input was " + this.value );
+
+                if(ui.item){
+                    feedy.setSelectedMarket(ui.item.value);
+                    feedy.fetch();
+                }
+            }
+        });
+    });
+    </script>
+
+    <script type="text/javascript">
+
+        $(function(){
+
+
+            var MainContext = function() {};
+
+            _.extend(MainContext.prototype, Backbone.Events, {
+                hash:{},
+
+                getItem:function(id){
+                    return this.hash[id];
+                },
+
+                storeItem:function(id, value){
+                    this.hash[id] = value;
+                }
+
+            });
+
+
+            var context = new MainContext();
+
+            var AppController = function(con){
+                this.cxt = con;
+                this.initialize();
+            };
+
+            _.extend(AppController.prototype, {
+
+                cxt:{},
+
+                handleWelcome:function(){
+                    console.log("handle welcome", this.cxt);
+                },
+
+                handleIntro:function(params){
+                    console.log("handle intro", params);
+                },
+
+                initialize:function(){
+
+                    var rt = this.events;
+
+                    for(var p in rt)
+                    {
+                        this.cxt.bind(p, this[rt[p]], this);
+                    }
+                },
+
+                events:{
+                    "onWelcome":"handleWelcome",
+                    "onIntro":"handleIntro"
+
+                }
+
+
+            });
+
+            
+            var controller = new AppController(context);
+
+
+            context.trigger("onWelcome");
+            context.trigger("onIntro", "hi there");
+
+
+
+        });
+
+
+
+    </script>
+
+</body>
+</html>
