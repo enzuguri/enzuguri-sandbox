@@ -34,7 +34,7 @@ window.FeedModel = Backbone.Collection.extend({
 
 
 
-                return data.data;
+                return _.sortBy(data.data, "updated_time").reverse();
             },
 
 
@@ -51,6 +51,9 @@ window.FeedModel = Backbone.Collection.extend({
                 if(item.type == 237){
                     var firstMedia = item.attachment.media[0];
 
+                    if(!firstMedia){
+                        firstMedia = {type:"null"}
+                    }
                     switch(firstMedia.type){
                         case "swf":
                             item.picture = firstMedia.src;

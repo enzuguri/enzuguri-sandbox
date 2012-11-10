@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Facebook DSP Admin</title>
+	<link rel="stylesheet" type="text/css" href="bootstrap.min.css"/>
+
+	<style>
+
+        ul.ui-autocomplete
+        {
+            list-style: none;
+            width:210px;
+            background-color: #FFFFFF;
+            border: 1px solid #CCCCCC;
+            color: #555555;
+            font-size: 13px;
+            line-height: 18px;
+            padding: 4px;
+            
+
+        }
+
+    </style>
+
+</head>
+<body>
+
+	<div class="container">
+
+		<div class="row">
+			<div class="span12">
+				<form class="well form-inline">
+					<a class="btn btn-warning debug">Add Developer tools</a>
+					<div id="spinner" style="height:30px;"></div>
+				</form>
+			</div>
+		</div>
+		<div class="row">
+			<div class="span12 table-container">
+				
+			</div>
+		</div>
+	</div>
+
+
+	<script type="text/template" id="tr-template">
+		<h2>Showing <span class="badge badge-info"><%= count %></span> posts, way back to <em><%=date%></em></h2>
+		<a class="btn loadFB">Load More</a>
+		<table class="table table-striped">
+					
+		<thead>
+			<tr>
+				<th style="width:156px;">Date Posted</th>
+				<th style="width:64px;">Post Type</th>
+				<th style="min-width:130px">Picture?</th>
+				<th>Message</th>
+				<th>Info</th>
+			</tr>
+		</thead>
+		<% var names = []; for(var p in data){ names.push(p); }
+			_.chain(names.sort()).each(function(name){ 
+				var rows = data[name];	
+		%>
+
+			<thead>
+				<tr>
+					<th colspan="4" class="country-title"><span class="badge badge-warning"><%= rows.length %></span> <%= name %></th>
+				</tr>
+			</thead>
+			<tbody class="country-posts" style="display:none;">
+			<% 
+				var reveresed = _.chain(rows).sortBy("timestring").value().reverse();
+				_.each(reveresed, function(m){  var item = m.toJSON(); %>
+				
+					<tr>
+						<td>
+							<strong><%= m.date.toLocaleTimeString() %></strong>
+							<br/>
+							<%= m.date.toLocaleDateString() %>
+							<br/>
+							<% var since = Math.floor(m.timestring/1000); %>
+							<span class="debug" style="display:none"><a target="_blank" href="http://www.desperadosbeer.com/endpoint/facebook-historical-posts/?FeedId=3&SinceTime=<%= since-1 %>"><%=since%></a></span>
+						</td>
+						<td><span class="label label-info"><%= item.type %></span></td>
+						<td><a href="<%= item.picture ? item.picture.replace('_s.', '_o.') : '' %>" target="_blank"><img src="<%= item.picture %>" /></a></td>
+						<td><%= item.message %></td>
+						<td>
+							<dl>
+								<dt>Likes</dt>
+									<dd><span class="badge badge-info"><%= item.likes ? item.likes.count : 0 %></span></dd>
+								<dt>Comments</dt>
+									<dd><span class="badge badge-warning"><%= item.comments ? item.comments.count : 0 %></span></dd>
+								<dt>Facebook id</dt>
+									<dd><a target="_blank" href="<%= item.link %>"><%= item.object_id %></a></dd>
+								
+							</dl>
+						</td>
+					</tr>
+
+			<% }); %>
+
+			</tbody>
+		<% }) %>
+		</table>
+		
+	</script>
+
+
+
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
+	<script src="http://ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js"></script>
+	<script type="text/javascript" src="http://fgnass.github.com/spin.js/dist/spin.min.js"></script>
+	<script src="http://documentcloud.github.com/underscore/underscore-min.js"></script>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/backbone.js/0.9.2/backbone-min.js"></script>
+	<script src="FeedCollection.js"></script>
+
+	<script>
+    $(function() {
+
+        var details = {actorId:"128827277157119",accessToken:"AAADD5bstFV0BAKDemvloilkLnhbrNqXXPjAazTm6HP6AedekaN036NZB8Ve4ONSHQQAflwmaMIf7fgi3LunIu8AB6dEI6IMJnapGW8AZDZD"};
+
+
+        var spinner = new Spinner({}).spin($("#spinner")[0]);
+
+	    var feed = window.Feed = new FeedCollection(null, details);
+
+	    var tmpl = $("#tr-template").html();
+
+        var ViewClass = Backbone.View.extend({
+
+
+        	initialize:function(args)
+        	{
+        		this.tmpl = _.template(args.template);
+        	},
+
+        	render:function(){
+        		$("#spinner").hide();
+
+        		var groups = this.model.groupByPrivacyDescription();
+
+        		var item = this.model.last();
+
+        		this.$el.html(this.tmpl({data:groups, count:this.model.size(), date:item ? item.date : "never"}));
+        	},
+
+        	events:{
+        		"click th.country-title":"headerClick",
+        		"click a.loadFB":"loadClick"
+        	},
+
+        	loadClick:function(e){
+        		$("#spinner").show();
+        		var self = this;
+        		this.model.fetch({add:"add", success:function(){ self.render(); }});
+
+        		return false;
+        	},
+
+        	headerClick:function(e){
+        		console.log(e);
+
+        		var curr = $(e.target);
+
+        		var cell = curr.parents("thead").next("tbody");
+        		cell.toggle();
+        	},
+
+        	toggleDebug:function(){
+        		this.$el.find("span.debug").toggle();
+        	}
+
+
+        });
+
+        var view = new ViewClass({model:feed, el:$("div.table-container"), template:tmpl});
+
+
+        view.render();
+
+        $("a.btn.debug").click(function(){
+
+        	view.toggleDebug();
+
+        	return false;
+        });
+
+    });
+    </script>
+</body>
+</html>

@@ -5,6 +5,24 @@
     <title>Backbone Context</title>
     <link rel="stylesheet" type="text/css" href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css"/>
 
+    <style>
+
+        ul.ui-autocomplete
+        {
+            list-style: none;
+            width:210px;
+            background-color: #FFFFFF;
+            border: 1px solid #CCCCCC;
+            color: #555555;
+            font-size: 13px;
+            line-height: 18px;
+            padding: 4px;
+            
+
+        }
+
+    </style>
+
 </head>
 <body>
 
@@ -17,11 +35,17 @@
                     <label class="checkbox">Target Country</label>
                     <input id="birds" type="text" class="input-large" placeholder="Country" />
                     <label class="checkbox">Since Date</label>
-                    <input type="text" id="datepicker" class="input-small">
+                    <input type="text" id="datepicker" class="input-small"/>
+                    <label class="checkbox">Facebook format:</label>
+                    <span id="since" class="input-xlarge uneditable-input"></span>
                 </form>
             </div>
         </div>
-
+        <div class="row">
+            <div class="span12">
+                <div id="spinner" style="height:80px;"></div>
+            </div>
+        </div>
         <div class="row">
             <div class="span12">
                 <table class="table table-striped">
@@ -30,7 +54,7 @@
                       <th>Date</th>
                       <th>Type</th>
                       <th>Message</th>
-                      <th>attachment</th>
+                      <th>Attachment</th>
                     </tr>
                   </thead>
                   <tbody id="market-data">
@@ -50,6 +74,8 @@
                     <%= d.getDate() %>/<%=(d.getMonth() + 1)%>/<%=d.getYear()%>
                     <br/>
                     <%= d.getHours() %>:<%=d.getMinutes()%>
+                    <br/>
+                    <%= item.created_time %>
                 </td>
                 <td><%= item.type %></td> 
                 <td><%= item.message %></td>
@@ -81,9 +107,11 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
     <script src="http://code.jquery.com/ui/1.8.19/jquery-ui.min.js"></script>
     <script src="http://ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js"></script>
+    <script type="text/javascript" src="http://fgnass.github.com/spin.js/dist/spin.min.js"></script>
     <script src="http://documentcloud.github.com/underscore/underscore-min.js"></script>
     <script src="http://cdnjs.cloudflare.com/ajax/libs/backbone.js/0.9.2/backbone-min.js"></script>
     <script src="social-mixin.js"></script>
+    <script src="FeedCollection.js"></script>
 
     <style>
     .ui-autocomplete-loading { background: white url('images/ui-anim_basic_16x16.gif') right center no-repeat; }
@@ -92,11 +120,26 @@
     $(function() {
 
 
+        var details = {actorId:"128827277157119",accessToken:"AAADD5bstFV0BAKDemvloilkLnhbrNqXXPjAazTm6HP6AedekaN036NZB8Ve4ONSHQQAflwmaMIf7fgi3LunIu8AB6dEI6IMJnapGW8AZDZD"};
 
-        var feedy = new FeedModel({actorId:"128827277157119",accessToken:"AAADD5bstFV0BAKDemvloilkLnhbrNqXXPjAazTm6HP6AedekaN036NZB8Ve4ONSHQQAflwmaMIf7fgi3LunIu8AB6dEI6IMJnapGW8AZDZD"});
+        var feedy = new FeedModel(details);
         
 
+
+        
         window.Feed = feedy;
+
+        window.AltFeed = new FeedCollection(details);
+
+
+        if(window.location.search.indexOf("appInstall") > -1){
+            var el = document.createElement("img");
+            el.setAttribute("height", "1");
+            el.setAttribute("width", "1");
+            el.setAttribute("alt", "Mediaplex_tag");
+            el.setAttribute("src", "//altfarm.mediaplex.com/ad/bk/19547-138995-3840-0?App_install=1&amp;mpuid=" + Math.floor(Math.random() * 1000));
+            document.getElementsByTagName("body")[0].appendChild(el);
+        }   
 
 
         var MarketDataView = Backbone.View.extend({
@@ -106,16 +149,16 @@
             },
 
             render:function(){
+                $("#spinner").hide();
                 var tmp = this.options.template;
                 var data = this.model.toJSON();
-
-                console.log(data);
-
                 this.el.innerHTML = _.template(tmp, {data:data});
             }
 
         });
 
+        var spinner = new Spinner({}).spin($("#spinner")[0]);
+        $("#spinner").hide();
 
         var listView = new MarketDataView({model:feedy, el:$("#market-data"), template:$("#market-data-template").html()});
 
@@ -124,24 +167,35 @@
         $( "#datepicker" ).datepicker({
             onClose: function(dateText, inst) { 
                 var d  = new Date(dateText);
-                console.log(d, d.getTime() / 1000); 
+                var tstr = d.getTime() / 1000;
+                $("#since").text("since="+tstr);
+                
             }
         });
 
-        $( "#birds" ).autocomplete({
-            source: ["United Kingdom", "Ireland", "Spain", "Germany"],
-            minLength: 2,
-            select: function( event, ui ) {
-                console.log( ui.item ?
-                    "Selected: " + ui.item.value :
-                    "Nothing selected, input was " + this.value );
 
+        var countries = ["Romania","Portugal","Spain","Austria","France","Ireland","Germany","Poland","Russia","United Kingdom","Netherlands","Belgium","Switzerland","Bulgaria","Croatia","Slovakia","Brazil","New Caledonia", "Public"];
+
+
+        $( "#birds" ).autocomplete({
+            source: countries,
+            minLength: 0,
+            select: function( event, ui ) {
                 if(ui.item){
                     feedy.setSelectedMarket(ui.item.value);
                     feedy.fetch();
+                    $("#spinner").show();
                 }
             }
         });
+
+
+
+
+
+
+
+
     });
     </script>
 

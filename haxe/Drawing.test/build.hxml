@@ -1,0 +1,23 @@
+-cp Source
+
+# Uncomment the desirable target
+# JavaScript target
+# -js Export/Drawing.test.js
+
+# SWF 9 target
+# -swf9 Export/Drawing.test.swf
+
+# ActionScript3 target
+# -as3 Export
+
+# Neko target
+# -neko Export/Drawing.test.n
+
+# PHP target
+# -php Export
+
+# C++ target
+# -cpp Export
+
+# Uncomment and place your main class with package
+# -main package.subpackage.ClassName

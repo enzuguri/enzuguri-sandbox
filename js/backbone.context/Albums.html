@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Facebook DSP Admin</title>
+	<link rel="stylesheet" type="text/css" href="bootstrap.min.css"/>
+
+	<style>
+
+        ul.ui-autocomplete
+        {
+            list-style: none;
+            width:210px;
+            background-color: #FFFFFF;
+            border: 1px solid #CCCCCC;
+            color: #555555;
+            font-size: 13px;
+            line-height: 18px;
+            padding: 4px;
+            
+
+        }
+
+	    .ui-autocomplete-loading { background: white url('images/ui-anim_basic_16x16.gif') right center no-repeat; }
+    </style>
+
+</head>
+<body>
+
+	<div class="container">
+
+		<div class="row">
+			<div class="span12 form-container">
+				<form class="form-horizontal">
+				  <div class="control-group">
+				    <label class="control-label">Retrieve Albums</label>
+				    <div class="controls">
+				      <a href="#" class="btn btn-info collect">Get Albums</a>
+				    </div>
+				  </div>
+				  <div class="control-group">
+				    <label class="control-label" for="inputAlbum">Find Album</label>
+				    <div class="controls">
+				      <input type="text" class="input-large autocomp" id="inputAlbum" placeholder="Type Album Name" />
+				    </div>
+				  </div>
+				  <div class="control-group">
+				    <label class="control-label" for="selectAlbum">Select Album</label>
+				    <div class="controls">
+				      <select class="albums span5" id="selectAlbum" multiple="multiple">
+					</select>
+				    </div>
+				  </div>
+				  <div class="control-group">
+				    <label class="control-label" for="coverPhoto">Album Info</label>
+				    <div class="controls">
+						<span class="input-xlarge uneditable-input album-id">album ID</span>
+						<div>
+							<img class="cover"/>
+						</div>
+						
+				    </div>
+				  </div>
+				</form>
+
+			</div>
+		</div>
+	</div>
+
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
+	<script src="http://code.jquery.com/ui/1.8.19/jquery-ui.min.js"></script>
+	<script src="http://ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js"></script>
+	<script src="http://documentcloud.github.com/underscore/underscore-min.js"></script>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/backbone.js/0.9.2/backbone-min.js"></script>
+	
+
+	<script>
+    $(function() {
+
+        var details = {actorId:"128827277157119",accessToken:"AAADD5bstFV0BAKDemvloilkLnhbrNqXXPjAazTm6HP6AedekaN036NZB8Ve4ONSHQQAflwmaMIf7fgi3LunIu8AB6dEI6IMJnapGW8AZDZD"};
+
+
+
+        var AlbumCollection = Backbone.Collection.extend({
+
+        	model:Backbone.Model.extend({
+
+        		url:function(){
+        			var photo = this.get("cover_photo");
+        			return "https://graph.facebook.com/"+photo+"/?access_token=" + details.accessToken;
+        		},
+
+        		getCoverPhoto:function(cb){
+        			var self = this;
+        			if(_.isString(this.coverLink)){
+        				cb(self.coverLink);
+        			}else{
+	        			this.fetch({success:function(a, data, c){
+	        				self.coverLink = data.picture;
+	        				cb(self.coverLink);
+	        			}});
+	        		}
+        		},
+
+        		parse:function(resp){
+        			if(this.isNew()) return resp;
+        			return this.toJSON();
+        		}
+        	}),
+
+        	selectedItem:null,
+
+        	initialize:function(models, token){
+        		this.token = token;
+        	},
+
+        	url:function(){
+        		return "https://graph.facebook.com/128827277157119/albums?limit=100&access_token=" + this.token;
+        	},
+
+        	parse:function(resp){
+        		return resp.data;
+        	},
+
+        	searchNames:function(name){
+        		return this.chain().filter(function(item){
+            		return item.get("name").toLowerCase().indexOf(name) > -1;
+            	}).map(function(item){ 
+            		return {label:item.get("name"), value:item.id}; 
+            	}).value();
+        	},
+
+        	selectItem:function(id){
+        		this.selectedItem = this.get(id);
+        		this.trigger("select:item");
+        	}
+        });
+
+        var AlbumSelect = Backbone.View.extend({
+        	
+        	initialize:function(){
+        		this.model.bind("reset", this.render, this);
+        		this.model.bind("select:item", this.showCover, this);
+
+
+        		var self = this;
+
+        		this.$el.find( "input.autocomp" ).autocomplete({
+		            source: function(req, add){
+		            	var toLow = req.term.toLowerCase();
+		            	add(self.model.searchNames(toLow));
+		            },
+		            minLength: 1,
+		            select: function( event, ui ) {
+		            	$(this).val(ui.item.label);
+		                if(ui.item){
+		                    if(ui.item){
+		                    	self.model.selectItem(ui.item.value);
+		                    }
+		                }
+		            }
+        		});
+
+        	},
+
+        	render:function(){
+
+        		var select = this.$el.find("select.albums");
+        		select.empty();
+
+    			var options = _.map(this.model.toJSON(), function(item){
+    				return "<option value='"+item.id+"'>" + item.name + "</option>";
+    			});
+
+    			select.append(options.join());
+
+        	},
+
+        	events:{
+        		"change select.albums":"onAlbumChange",
+        		"click a.collect":"onCollectClick"
+        	},
+
+        	onAlbumChange:function(e){
+        		var opt = this.$el.find("select.albums option:selected");
+        		this.$el.find("input.autocomp").val(opt.text());
+        		this.model.selectItem(opt.val());
+        	},
+
+        	showCover:function(){
+        		console.log(this.model.selectedItem);
+
+        		var mm = this.model.selectedItem;
+
+        		var img = this.$el.find("img.cover");
+
+        		var cb = function(link){
+        			img.attr("src", link);
+        		}
+
+        		if(mm){
+        			mm.getCoverPhoto(cb);
+        			this.$el.find("span.album-id").text(mm.id);
+        		}
+
+        		
+        	},
+
+        	onCollectClick:function(e){
+        		this.model.fetch();
+        	}
+
+        });
+
+        var albums = new AlbumCollection(null, details.accessToken);
+
+        var view = new AlbumSelect({el:$(".form-container"), model:albums});
+
+        
+
+    });
+    </script>
+</body>
+</html>
