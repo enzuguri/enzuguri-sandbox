@@ -10,15 +10,21 @@ class Scale {
 
     var _root:Pitch;
 
+    public var root(get_root, set_root):Pitch;
+
+    function get_root():Pitch{ return _root; }
+
+    function set_root(value:Pitch):Pitch{
+        _root = value;
+        return value;
+    }
+
 
     public function asMode(mode:Mode):Scale
     {
         var index = Type.enumIndex(mode);
-
-        var back = _toneOrder.slice(0, index);
-        var front = _toneOrder.slice(index, _toneOrder.length);
-
-        return new Scale(front.concat(back), pitchAtPosition(index));
+        var newOrder = ModeUtil.reorderSequence(_toneOrder, index);
+        return new Scale(newOrder, pitchAtPosition(index));
 
     }
 

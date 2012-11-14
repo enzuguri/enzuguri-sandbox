@@ -1,5 +1,5 @@
 package music.theory;
-enum Note {
+enum NoteName {
     C;
     CSharp;
     D;

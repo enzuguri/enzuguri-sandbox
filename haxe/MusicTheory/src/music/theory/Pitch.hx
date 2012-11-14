@@ -35,7 +35,7 @@ class Pitch {
     {
         var abs = _tone % 12;
 
-        var note = Type.createEnumIndex(Note, abs);
+        var note = Type.createEnumIndex(NoteName, abs);
 
         return Type.enumConstructor(note);
     }
